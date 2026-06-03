@@ -54,7 +54,5 @@ This project is a hybrid **ETL (Extract, Transform, Load)** pipeline designed to
 
 ### 📂 Archivos del Proyecto / Project Files
 
-* `BaseIndustrias_CantidadAfiliados.py`, `BaseIndustrias_MontosCreditosConsumo.py`, `BaseIndustrias_tasas.py`, `BaseIndustrias_TotalCreditosConsumo.py`: Script de Python para la lectura iterativa de archivos, limpieza posicional y consolidación local / *Python script for iterative file reading, positional cleansing, and local consolidation*.
 * `CargaAporteUnoPython.py`: Script modular para la ingesta y sanitización automática de rendiciones contables, conectividad UNC nativa por bloques y orquestación síncrona de SPs / *Modular script for automated accounting settlement ingestion, native UNC chunked connectivity, and synchronous SP orchestration*.
-* `Etl_BaseIndustria_CantidadAfiliado.sql`, `Etl_BaseIndustria_MontosCreditoConsumo`, `Etl_BaseIndustria_TasaCredito.sql`, `Etl_BaseIndustria_TotalCreditoConsumo`: Procedimiento almacenado de consolidación y unpivot ejecutado tras la ingesta manual / *Consolidation and unpivot stored procedure executed after manual ingestion*.
 * `Etl_Actualiza_1por_tem.sql`, `Etl_Actualiza_1por.sql`: Procedimientos almacenados para la actualización transitoria y consolidación definitiva del aporte del 1% de pensionados / *Stored procedures for transient updates and definitive consolidation of the 1% pensioner contribution*.
