@@ -49,10 +49,12 @@ VALUES (?, ORIGINAL_LOGIN(), GETDATE(), ?, CAST(GETDATE() AS DATE), ?, ?)
 # CONFIGURAR IDIOMA ES
 locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
 
-rutaOperaciones = Path(r"\\losheroes.losheroes.cl\public2\Usuarios\Contabilidad\5 OTRAS ÁREAS (OPERACIONES-EMISORA)\REPORTES AREAS OPERACIONES")
+rutaOperaciones = Path(r"\\losheroes.losheroes.cl\public2\Usuarios\Contabilidad\5 OTRAS ÃREAS (OPERACIONES-EMISORA)\REPORTES AREAS OPERACIONES")
 
 fechaActual = datetime.now()
 
+
+# SI EL PROCESO Y EL ARCHIVO CORRESPONDEN AL MISMO AÃ‘O EN CUESTIÃ“N, SE DESCOMENTAR DESDE AQUÃ Y COMENTAR EL MES ANTERIOR
 #-----------------------
 # #----FECHA ACTUAL
 # anio = fechaActual.year
@@ -122,53 +124,7 @@ if sheet_name:
 
     df_raw = pd.read_excel(archivo_especifico, sheet_name=sheet_name_target, skiprows=1, header=None)
     df_raw = df_raw.dropna(how='all').reset_index(drop=True)
-    df_destino = pd.DataFrame()
-
-    # #-----------------------
-    # #----PERIODO MES
-    # #------------------------
-
-    # periodo_original = df_raw.iloc[:, 2].astype(str).str.strip().str.lower()
-
-    #     # Diccionario infalible para traducir el texto a número de mes
-    # meses_dicc = {
-    #     'ene': '01', 'feb': '02', 'mar': '03', 'abr': '04', 
-    #     'may': '05', 'jun': '06', 'jul': '07', 'ago': '08', 
-    #     'sep': '09', 'oct': '10', 'nov': '11', 'dic': '12'
-    # }
-
-    # def limpiar_y_convertir_periodo(texto):
-    #     try:
-    #         # Caso A: Si viene con guion (ej: 'may-26', 'abr-26', 'mar-2026')
-    #         if '-' in texto:
-    #             mes_texto, anio_texto = texto.split('-')
-    #             mes_texto = mes_texto.strip()
-    #             anio_texto = anio_texto.strip()
-            
-    #             # Si el año viene en 2 dígitos (ej: '26'), lo pasamos a 4 ('2026')
-    #             if len(anio_texto) == 2:
-    #                 anio_texto = f"20{anio_texto}"
-            
-    #             # Tomamos las primeras 3 letras del mes para buscar en el diccionario
-    #             mes_num = meses_dicc.get(mes_texto[:3])
-            
-    #             if mes_num:
-    #                 return f"{anio_texto}-{mes_num}-01"
-
-    #         # Caso B: Si Excel ya lo leyó como una fecha completa (ej: '2026-05-01 00:00:00')
-    #         # Extraemos los primeros 10 caracteres (YYYY-MM-DD)
-    #         if len(texto) >= 10 and texto[4] == '-' and texto[7] == '-':
-    #             return texto[:10]
-            
-    #         return None
-    #     except:
-    #         return None
-    # #-----------------------
-    # #----FIN PERIODO MES
-    # #------------------------
-
-
-    
+    df_destino = pd.DataFrame() 
 
     
     df_destino['FOLIO'] = pd.to_numeric(df_raw.iloc[:, 0], errors='coerce').fillna(0).astype('int64').astype(str) # Formato para bigint en bbdd sql
@@ -177,7 +133,7 @@ if sheet_name:
     # ----------------------------------------------------
     # TRATAMIENTO PARA EL CAMPO PERIODO
     # ----------------------------------------------------
-    # 1. Aseguramos texto limpio, sin espacios y en minúsculas
+    # 1. Aseguramos texto limpio, sin espacios y en minÃºsculas
     periodo_original = df_raw.iloc[:, 2].astype(str).str.strip().str.lower()
 
     # Diccionario manual para normalizar los meses con texto
@@ -188,7 +144,7 @@ if sheet_name:
     }
 
     def estandarizar_periodo(texto):
-        # Si la celda viene vacía en el Excel
+        # Si la celda viene vacÃ­a en el Excel
         if not texto or texto in ['nan', 'none', '']:
             return None
         try:
@@ -197,17 +153,17 @@ if sheet_name:
             if len(texto) >= 10 and texto[4] == '-' and texto[7] == '-':
                 return texto[:10]
 
-            # Caso B: Si viene con el formato problemático con guion (ej: 'mar-26', 'feb-26')
+            # Caso B: Si viene con el formato problemÃ¡tico con guion (ej: 'mar-26', 'feb-26')
             if '-' in texto:
                 partes = texto.split('-')
                 mes_txt = partes[0].strip()
                 anio_txt = partes[1].strip()
                 
-                # Si el año viene en 2 dígitos ('26'), lo pasamos a 4 ('2026')
+                # Si el aÃ±o viene en 2 dÃ­gitos ('26'), lo pasamos a 4 ('2026')
                 if len(anio_txt) == 2:
                     anio_txt = f"20{anio_txt}"
                 
-                # Buscamos el equivalente numérico del mes usando las 3 primeras letras
+                # Buscamos el equivalente numÃ©rico del mes usando las 3 primeras letras
                 mes_num = meses_dicc.get(mes_txt[:3])
                 if mes_num:
                     return f"{anio_txt}-{mes_num}-01"
@@ -222,15 +178,16 @@ if sheet_name:
     df_destino['RENTA'] = pd.to_numeric(df_raw.iloc[:, 4], errors='coerce').fillna(0).astype('int64').astype(str)
     df_destino['APORTE'] = pd.to_numeric(df_raw.iloc[:, 5], errors='coerce').fillna(0).astype('int64').astype(str)
     df_destino['OBS'] = df_raw.iloc[:, 6].astype(str).str.strip()
+    #--SI CORRESPONDE A LA FECHA ACTUAL HABILITAR ESTA LINEA Y COMENTAR LA FECHA DEL MES ANTERIOR
     df_destino['FECHA'] = fecha_mes_anterior.strftime('%Y-%m-%d') + ' 00:00:00.000'
+    #df_destino['FECHA'] = fechaActual.strftime('%Y-%m-%d') + ' 00:00:00.000'
 
-
-    # CORRECCIÓN 2: Obtener la cantidad de registros directamente del DataFrame mapeado
+    # CORRECCIÃ“N 2: Obtener la cantidad de registros directamente del DataFrame mapeado
     cantidadFilas = len(df_destino)
     print(f"Cantidad de registros listos para insertar: {cantidadFilas}")
     
     #-----------------------
-    #---PROCESO DE INSERCIÓN MASIVA 
+    #---PROCESO DE INSERCIÃ“N MASIVA 
     #-----------------------
     
     try:
@@ -264,7 +221,7 @@ if sheet_name:
         
         query_sp = "exec dbo.Etl_Actualiza_1por_tem"
         cursor.execute(query_sp)
-        print("   -> Procedimiento ejecutado con éxito.\n")
+        print("   -> Procedimiento ejecutado con Ã©xito.\n")
         conexion.commit()
         
         # -- LOG ACTUALIZACION TEMPORAL
@@ -279,7 +236,7 @@ if sheet_name:
         
         query_sp = "exec dbo.Etl_Actualiza_1por"
         cursor.execute(query_sp)
-        print("   -> Procedimiento ejecutado con éxito.\n")
+        print("   -> Procedimiento ejecutado con Ã©xito.\n")
         conexion.commit()
 
         # -- LOG ACTUALIZACION TEMPORAL
@@ -298,15 +255,15 @@ if sheet_name:
 
 
 else:
-    print("No se encontró ningún archivo que coincida con el patrón 'Auxiliar 4161200010*.xlsx' en la ruta especificada.")
+    print("No se encontrÃ³ ningÃºn archivo que coincida con el patrÃ³n 'Auxiliar 4161200010*.xlsx' en la ruta especificada.")
 
 
 
 
 # if rutaOperaciones.exists():
-#     print("¡Conexión exitosa! Listando archivos:")
+#     print("Â¡ConexiÃ³n exitosa! Listando archivos:")
 #     for archivo in rutaOperaciones.iterdir():
 #         if archivo.is_file():
 #             print(f"- {archivo.name}")
 # else:
-#     print("No se pudo acceder a la ruta. Verifica la conexión o los permisos.")
+#     print("No se pudo acceder a la ruta. Verifica la conexiÃ³n o los permisos.")
